@@ -1,0 +1,172 @@
+// ==UserScript==
+// @name        ETUTOR
+// @namespace   etutor
+// @include     https://www.etutor.pl/repetitions
+// @require     http://code.jquery.com/jquery-1.11.1.min.js
+// @version     1
+// @grant       unsafeWindow
+// @grant       GM_registerMenuCommand
+// @grant       GM_getValue
+// @grant       GM_setValue
+// @grant       GM_xmlhttpRequest
+// @grant       GM_openInTab
+// ==/UserScript==
+
+//variables 
+
+
+
+var mojeFunkcje = {
+	testujemy: function(){
+	var answe;
+	answe = $("#answer > .maintext").innerHTML;
+	alert(answe);
+	}
+};
+
+function testujemy1() {
+	var answe;
+	answe = $("#answer > .maintext").innerHTML;
+	alert(answe);
+};
+
+
+
+  
+    
+
+
+
+
+$( document ).ready(function() {
+$("#repbuttons").append("<div><button id='sprawdzacz' style='background-color:#4CAF50; border:none;color: white; padding: 15px 32px; text-align: center; text-decoration: none;  display: inline-block; font-size: 16px;'>Sprawdzacz</button></div>");
+$("#sprawdzacz").css("width", "150px");
+
+//$("#repetitionShowAnswer").on("click", function(){
+//
+//	alert('aa');
+//});
+
+
+
+$('body').on('keydown', function( e ) {
+      
+      var key = e.which;
+      var io  = e.type=="keydown"; // "0"if keydown; "1" if keyup
+      var keyAction = {                    // Object to store our stuff
+//  keyCode : [(0)KEYDOWN, (1)KEYUP]
+        49  : ['1'],            // R key
+        50  : ['2'],
+        51  : ['3'],
+        52  : ['4'],
+        82  : ['r']              // B key  (last one without comma!)
+      };
+      var keyArr = keyAction[key];
+
+      if(typeof keyArr != 'undefined') {   // Test (49 - 82 ) zwraca czy nie błąd      
+        		// pod przyciskiem ukrryta funkcja
+				//$("#sprawdzacz").on("click", function(){
+				    var question = $("#question > .maintext")[0].childNodes[0].nodeValue;
+				    var	answer = $("#answer > .maintext")[0].childNodes[0].nodeValue;
+					//answer = answer.replace(/<span.*$/,"");
+
+								GM_xmlhttpRequest({
+								  method: "POST",
+								  url: "http://aroxxx.webd.pl/test/test.php",
+								  data: encodeURI("id=1&question="+question+"&answer="+answer),
+								  headers: {
+								    "Content-Type": "application/x-www-form-urlencoded"
+								  },
+								  onload: function(res) {
+								    console.log('zapisane');
+				 					 }
+								});
+
+
+
+				// sprawdzamy od jakiego słowa słownikowego
+
+				if ($("#answer > .meaningExemplifiedByThisSentence").length === 0) {
+
+				// sprawdzamy czy to wyrazenie slowo jezeli wyrazenie pobieramy inne sentencje
+
+				    if ($("#answer > .sentence").length === 0)
+				    {
+				   	  // 	alert("Pytanie: "+question+"\n Odpowiedz: "+answer);
+				    }
+				    else
+				    {
+					    var sentence = $("#answer > .sentence");
+					    var sentenceAnswer = $("#answer > .sentence > .sentenceTranslation");
+					    var zdanie = '';
+					    	for (var i = 0 ; i < sentence.length ; i++)
+					    	{
+					    	var	sentenc = sentence[i].childNodes[0].nodeValue;
+
+					    	var	sentenc2 = sentenceAnswer[i].innerHTML;
+					    	//sentenc = sentenc.replace(/<span class=\"recordings.*$/,"");
+
+
+					    		GM_xmlhttpRequest({
+								  method: "POST",
+								  url: "http://aroxxx.webd.pl/test/magik.php",
+								  data: encodeURI("id=1&name=rtwe1&reserved=1"),
+								 // url: "http://aroxxx.webd.pl/test/test.php",
+								 // data: encodeURI("id=8&question="+sentenc2+"&answer="+sentenc),
+								  headers: {
+								    "Content-Type": "application/x-www-form-urlencoded"
+								  },
+								  onload: function(res) {
+									setTimeout(1000)
+								    console.log('zapisane');
+				 					 }
+								});
+
+					    	zdanie = zdanie + '\n' + sentenc + ' - ' + sentenc2;
+						   	}
+
+
+						alert("Pytanie: "+question+"\n Odpowiedz: "+answer+"\n"+zdanie);
+
+					}
+				   	
+					} else {
+
+						var sentenc = $("#answer > .meaningExemplifiedByThisSentence");
+						var sentence = sentenc[0].childNodes[0].nodeValue;
+						sentence = sentence.replace(/^\s\s*/, '');
+
+						var sentenceAnswer = sentenc[0].innerHTML;
+						sentenceAnswer = sentenceAnswer.replace(/.*?= /,"");
+						sentenceAnswer = sentenceAnswer.replace(/<span .*/,"");
+						sentenceAnswer = sentenceAnswer.replace(/^\s\s*/, '');
+						alert("Pytanie: "+question+"\n Odpowiedz: "+answer + sentence + sentenceAnswer);
+
+								GM_xmlhttpRequest({
+								  method: "POST",
+								  url: "http://aroxxx.webd.pl/test/test.php",
+								  data: encodeURI("id=8&question="+sentenceAnswer+"&answer="+sentence),								  
+								  headers: {
+								    "Content-Type": "application/x-www-form-urlencoded"
+								  },
+								  onload: function(res) {
+								    console.log('zapisane');
+				 					 }
+								});
+
+					}
+
+
+				   	//https://www.etutor.pl/images-common/en/mp3/night.mp3
+					//  });
+
+
+
+      }
+
+    });
+
+
+
+
+});
